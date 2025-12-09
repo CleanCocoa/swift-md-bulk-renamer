@@ -25,10 +25,12 @@ git checkout examples/
 | report_draft.txt | 2024-annual-report.txt |
 | IMG_001.jpg | vacation/beach.jpg |
 | notes.md | docs/meeting-notes.md |
+| my notes (draft).txt | My Docs/Final Notes.txt |
 
 This demonstrates:
 - Simple rename (`report_draft.txt` → `2024-annual-report.txt`)
 - Move into new subdirectory (`IMG_001.jpg` → `vacation/beach.jpg`)
 - Move with path (`notes.md` → `docs/meeting-notes.md`)
+- Spaces and special characters (`my notes (draft).txt` → `My Docs/Final Notes.txt`)
 
 Subdirectories are created automatically when needed.

@@ -134,3 +134,69 @@ import Testing
 	let content = try String(contentsOf: testFile, encoding: .utf8)
 	#expect(content == "content")
 }
+
+@Test func `renames files with spaces in names`() throws {
+	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
+		UUID().uuidString
+	)
+	defer { try? FileManager.default.removeItem(at: tempDir) }
+
+	try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+	let sourcePath = tempDir.appendingPathComponent("my document.txt")
+	try "content".write(to: sourcePath, atomically: true, encoding: .utf8)
+
+	let executor = Executor(baseDirectory: tempDir)
+	let instructions = [Instruction(from: "my document.txt", to: "renamed file.txt")!]
+
+	try executor.execute(instructions)
+
+	let destinationPath = tempDir.appendingPathComponent("renamed file.txt")
+	#expect(FileManager.default.fileExists(atPath: destinationPath.path))
+	#expect(!FileManager.default.fileExists(atPath: sourcePath.path))
+}
+
+@Test func `renames into directory with spaces`() throws {
+	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
+		UUID().uuidString
+	)
+	defer { try? FileManager.default.removeItem(at: tempDir) }
+
+	try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+	let sourcePath = tempDir.appendingPathComponent("source.txt")
+	try "content".write(to: sourcePath, atomically: true, encoding: .utf8)
+
+	let executor = Executor(baseDirectory: tempDir)
+	let instructions = [Instruction(from: "source.txt", to: "My Documents/Project Files/target.txt")!]
+
+	try executor.execute(instructions)
+
+	let destinationPath = tempDir.appendingPathComponent("My Documents/Project Files/target.txt")
+	#expect(FileManager.default.fileExists(atPath: destinationPath.path))
+	#expect(!FileManager.default.fileExists(atPath: sourcePath.path))
+
+	let content = try String(contentsOf: destinationPath, encoding: .utf8)
+	#expect(content == "content")
+}
+
+@Test func `renames file with special characters`() throws {
+	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
+		UUID().uuidString
+	)
+	defer { try? FileManager.default.removeItem(at: tempDir) }
+
+	try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+	let sourcePath = tempDir.appendingPathComponent("notes (draft) [v1].txt")
+	try "content".write(to: sourcePath, atomically: true, encoding: .utf8)
+
+	let executor = Executor(baseDirectory: tempDir)
+	let instructions = [Instruction(from: "notes (draft) [v1].txt", to: "notes (final) [v2].txt")!]
+
+	try executor.execute(instructions)
+
+	let destinationPath = tempDir.appendingPathComponent("notes (final) [v2].txt")
+	#expect(FileManager.default.fileExists(atPath: destinationPath.path))
+	#expect(!FileManager.default.fileExists(atPath: sourcePath.path))
+}

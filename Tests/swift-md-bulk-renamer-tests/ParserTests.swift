@@ -70,3 +70,35 @@ import Testing
 	let parsed = try parse(markdown)
 	#expect(parsed == instructions)
 }
+
+@Test func `parses filenames with spaces`() throws {
+	let markdown = """
+		| From | To |
+		|------|-----|
+		| my file.txt | your file.txt |
+		| notes (draft).md | notes (final).md |
+		"""
+	let instructions = try parse(markdown)
+	#expect(
+		instructions == [
+			Instruction(from: "my file.txt", to: "your file.txt")!,
+			Instruction(from: "notes (draft).md", to: "notes (final).md")!,
+		]
+	)
+}
+
+@Test func `parses paths with spaces in directories`() throws {
+	let markdown = """
+		| From | To |
+		|------|-----|
+		| source.txt | My Documents/target.txt |
+		| data.csv | Project Files/2024 Data/report.csv |
+		"""
+	let instructions = try parse(markdown)
+	#expect(
+		instructions == [
+			Instruction(from: "source.txt", to: "My Documents/target.txt")!,
+			Instruction(from: "data.csv", to: "Project Files/2024 Data/report.csv")!,
+		]
+	)
+}
