@@ -16,11 +16,17 @@ let package = Package(
             targets: ["mvmd"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-markdown.git", from: "0.5.0"),
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "swift-md-bulk-renamer"
+            name: "swift-md-bulk-renamer",
+            dependencies: [
+                .product(name: "Markdown", package: "swift-markdown"),
+            ]
         ),
         .executableTarget(
             name: "mvmd",
