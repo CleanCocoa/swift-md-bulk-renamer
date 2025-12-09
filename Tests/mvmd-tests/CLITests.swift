@@ -1,4 +1,11 @@
+import Subprocess
 import Testing
+
+#if canImport(System)
+	import System
+#else
+	import SystemPackage
+#endif
 
 #if canImport(FoundationEssentials)
 	import FoundationEssentials
@@ -6,7 +13,7 @@ import Testing
 	import Foundation
 #endif
 
-@Test func `dry-run outputs from -> to format`() throws {
+@Test func `dry-run outputs from -> to format`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -28,7 +35,7 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: [markdownFile.path],
 		workingDirectory: tempDir
 	)
@@ -38,11 +45,17 @@ import Testing
 
 	#expect(FileManager.default.fileExists(atPath: file1.path))
 	#expect(FileManager.default.fileExists(atPath: file2.path))
-	#expect(!FileManager.default.fileExists(atPath: tempDir.appendingPathComponent("renamed1.txt").path))
-	#expect(!FileManager.default.fileExists(atPath: tempDir.appendingPathComponent("renamed2.md").path))
+	#expect(
+		!FileManager.default.fileExists(
+			atPath: tempDir.appendingPathComponent("renamed1.txt").path
+		)
+	)
+	#expect(
+		!FileManager.default.fileExists(atPath: tempDir.appendingPathComponent("renamed2.md").path)
+	)
 }
 
-@Test func `--apply executes renames`() throws {
+@Test func `--apply executes renames`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -64,7 +77,7 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: [markdownFile.path, "--apply"],
 		workingDirectory: tempDir
 	)
@@ -85,7 +98,7 @@ import Testing
 	#expect(content2 == "content2")
 }
 
-@Test func `--force bypasses destination exists check in dry-run`() throws {
+@Test func `--force bypasses destination exists check in dry-run`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -106,7 +119,7 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: [markdownFile.path, "--force"],
 		workingDirectory: tempDir
 	)
@@ -121,7 +134,7 @@ import Testing
 	#expect(destContent == "existing content")
 }
 
-@Test func `error when destination exists without --force`() throws {
+@Test func `error when destination exists without --force`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -142,8 +155,8 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	#expect(throws: (any Error).self) {
-		_ = try runMVMD(
+	await #expect(throws: (any Error).self) {
+		_ = try await runMVMD(
 			arguments: [markdownFile.path, "--apply"],
 			workingDirectory: tempDir
 		)
@@ -155,7 +168,7 @@ import Testing
 	#expect(destContent == "existing content")
 }
 
-@Test func `error when source file does not exist`() throws {
+@Test func `error when source file does not exist`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -171,15 +184,15 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	#expect(throws: (any Error).self) {
-		_ = try runMVMD(
+	await #expect(throws: (any Error).self) {
+		_ = try await runMVMD(
 			arguments: [markdownFile.path],
 			workingDirectory: tempDir
 		)
 	}
 }
 
-@Test func `error when path is absolute`() throws {
+@Test func `error when path is absolute`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -195,15 +208,15 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	#expect(throws: (any Error).self) {
-		_ = try runMVMD(
+	await #expect(throws: (any Error).self) {
+		_ = try await runMVMD(
 			arguments: [markdownFile.path],
 			workingDirectory: tempDir
 		)
 	}
 }
 
-@Test func `error when path contains parent directory escape`() throws {
+@Test func `error when path contains parent directory escape`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -219,15 +232,15 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	#expect(throws: (any Error).self) {
-		_ = try runMVMD(
+	await #expect(throws: (any Error).self) {
+		_ = try await runMVMD(
 			arguments: [markdownFile.path],
 			workingDirectory: tempDir
 		)
 	}
 }
 
-@Test func `stdin input with dash argument`() throws {
+@Test func `stdin input with dash argument`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -244,7 +257,7 @@ import Testing
 		| input.txt | output.txt |
 		"""
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: ["-"],
 		workingDirectory: tempDir,
 		stdin: markdown
@@ -254,7 +267,7 @@ import Testing
 	#expect(FileManager.default.fileExists(atPath: sourceFile.path))
 }
 
-@Test func `applies renames from stdin`() throws {
+@Test func `applies renames from stdin`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -271,7 +284,7 @@ import Testing
 		| before.txt | after.txt |
 		"""
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: ["-", "--apply"],
 		workingDirectory: tempDir,
 		stdin: markdown
@@ -287,7 +300,7 @@ import Testing
 	#expect(content == "content")
 }
 
-@Test func `handles subdirectory renames`() throws {
+@Test func `handles subdirectory renames`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -309,7 +322,7 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: [markdownFile.path, "--apply"],
 		workingDirectory: tempDir
 	)
@@ -324,7 +337,7 @@ import Testing
 	#expect(content == "content")
 }
 
-@Test func `CLI creates intermediate directories for destination`() throws {
+@Test func `CLI creates intermediate directories for destination`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -343,7 +356,7 @@ import Testing
 	let markdownFile = tempDir.appendingPathComponent("instructions.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: [markdownFile.path, "--apply"],
 		workingDirectory: tempDir
 	)
@@ -358,7 +371,7 @@ import Testing
 	#expect(content == "content")
 }
 
-@Test func `uses file parent directory as base for relative paths`() throws {
+@Test func `uses file parent directory as base for relative paths`() async throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
 		UUID().uuidString
 	)
@@ -378,7 +391,7 @@ import Testing
 	let markdownFile = subdir.appendingPathComponent("renames.md")
 	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
 
-	let output = try runMVMD(
+	let output = try await runMVMD(
 		arguments: ["subdir/renames.md", "--apply"],
 		workingDirectory: tempDir
 	)
@@ -393,50 +406,52 @@ import Testing
 private func runMVMD(
 	arguments: [String],
 	workingDirectory: URL,
-	stdin: String? = nil
-) throws -> String {
-	let process = Process()
+	stdin stdinInput: String? = nil
+) async throws -> String {
 	let projectRoot = URL(fileURLWithPath: #filePath)
 		.deletingLastPathComponent()
 		.deletingLastPathComponent()
 		.deletingLastPathComponent()
-	process.executableURL =
+	let executablePath =
 		projectRoot
 		.appendingPathComponent(".build")
 		.appendingPathComponent("debug")
 		.appendingPathComponent("mvmd")
-	process.arguments = arguments
-	process.currentDirectoryURL = workingDirectory
+		.path
 
-	let outputPipe = Pipe()
-	let errorPipe = Pipe()
-	process.standardOutput = outputPipe
-	process.standardError = errorPipe
-
-	if let stdin = stdin {
-		let inputPipe = Pipe()
-		process.standardInput = inputPipe
-		try inputPipe.fileHandleForWriting.write(contentsOf: Data(stdin.utf8))
-		try inputPipe.fileHandleForWriting.close()
-	}
-
-	try process.run()
-	process.waitUntilExit()
-
-	let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-	let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-
-	if process.terminationStatus != 0 {
-		let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
-		throw CLITestError.nonZeroExit(
-			status: process.terminationStatus,
-			output: errorOutput
+	let result: CollectedResult<StringOutput<UTF8>, StringOutput<UTF8>>
+	if let stdinInput {
+		result = try await run(
+			.path(FilePath(executablePath)),
+			arguments: Arguments(arguments),
+			environment: .inherit,
+			workingDirectory: FilePath(workingDirectory.path),
+			input: .string(stdinInput),
+			output: .string(limit: .max),
+			error: .string(limit: .max)
+		)
+	} else {
+		result = try await run(
+			.path(FilePath(executablePath)),
+			arguments: Arguments(arguments),
+			environment: .inherit,
+			workingDirectory: FilePath(workingDirectory.path),
+			input: .none,
+			output: .string(limit: .max),
+			error: .string(limit: .max)
 		)
 	}
 
-	return String(data: outputData, encoding: .utf8) ?? ""
+	guard result.terminationStatus.isSuccess else {
+		throw CLITestError.nonZeroExit(
+			status: result.terminationStatus,
+			output: result.standardError ?? ""
+		)
+	}
+
+	return result.standardOutput ?? ""
 }
 
 private enum CLITestError: Error {
-	case nonZeroExit(status: Int32, output: String)
+	case nonZeroExit(status: TerminationStatus, output: String)
 }

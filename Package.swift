@@ -20,6 +20,7 @@ let package = Package(
 		.package(url: "https://github.com/swiftlang/swift-markdown.git", from: "0.5.0"),
 		.package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
 		.package(url: "https://github.com/apple/swift-foundation.git", branch: "main"),
+		.package(url: "https://github.com/swiftlang/swift-subprocess.git", from: "0.0.1"),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -61,11 +62,12 @@ let package = Package(
 		.testTarget(
 			name: "mvmd-tests",
 			dependencies: [
+				.product(name: "Subprocess", package: "swift-subprocess"),
 				.product(
 					name: "FoundationEssentials",
 					package: "swift-foundation",
 					condition: .when(platforms: [.linux, .windows])
-				)
+				),
 			]
 		),
 	]
