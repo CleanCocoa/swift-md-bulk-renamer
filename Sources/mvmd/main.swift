@@ -37,14 +37,19 @@ struct MVMD: ParsableCommand {
 		let baseDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 		let fileManager = FileManager.default
 
-		let checkDestinations: (String) -> Bool = { path in
+		let checkExists: (String) -> Bool = { path in
 			let url = baseDirectory.appendingPathComponent(path)
 			return fileManager.fileExists(atPath: url.path)
 		}
 
+		for instruction in instructions {
+			try validateNotSymlink(instruction.from, in: baseDirectory, fileManager: fileManager)
+		}
+
 		let renameplan = try plan(
 			instructions: instructions,
-			checkDestinations: checkDestinations,
+			checkSourceExists: checkExists,
+			checkDestinationExists: checkExists,
 			force: force
 		)
 
