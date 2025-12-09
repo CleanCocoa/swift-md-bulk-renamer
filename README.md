@@ -2,6 +2,19 @@
 
 Batch file renamer driven by Markdown tables.
 
+## Quick Start
+
+```bash
+git clone https://github.com/your-org/swift-md-bulk-renamer.git
+cd swift-md-bulk-renamer
+swift build
+cd examples
+../.build/debug/mvmd README.md          # preview
+../.build/debug/mvmd README.md --apply  # execute
+```
+
+See [examples/](examples/) for demo files.
+
 ## Installation
 
 ```bash
