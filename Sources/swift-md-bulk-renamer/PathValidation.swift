@@ -52,8 +52,7 @@ public func validatePath(_ path: String) throws {
 
 public func validateNotSymlink(_ path: String, in baseDirectory: URL, fileManager: FileManager = .default) throws {
 	let fullPath = baseDirectory.appendingPathComponent(path).path
-	var isDirectory: ObjCBool = false
-	if fileManager.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
+	if fileManager.fileExists(atPath: fullPath) {
 		let attributes = try fileManager.attributesOfItem(atPath: fullPath)
 		if let fileType = attributes[.type] as? FileAttributeType, fileType == .typeSymbolicLink {
 			throw PathValidationError.sourceIsSymlink(path)
