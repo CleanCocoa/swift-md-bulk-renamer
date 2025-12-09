@@ -1,7 +1,5 @@
 import Testing
 
-@testable import swift_md_bulk_renamer
-
 #if canImport(FoundationEssentials)
 	import FoundationEssentials
 #else
@@ -398,9 +396,15 @@ private func runMVMD(
 	stdin: String? = nil
 ) throws -> String {
 	let process = Process()
-	process.executableURL = URL(
-		fileURLWithPath: "/Users/ctm/Coding/md-bulk-renamer/swift-md-bulk-renamer/.build/debug/mvmd"
-	)
+	let projectRoot = URL(fileURLWithPath: #filePath)
+		.deletingLastPathComponent()
+		.deletingLastPathComponent()
+		.deletingLastPathComponent()
+	process.executableURL =
+		projectRoot
+		.appendingPathComponent(".build")
+		.appendingPathComponent("debug")
+		.appendingPathComponent("mvmd")
 	process.arguments = arguments
 	process.currentDirectoryURL = workingDirectory
 

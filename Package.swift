@@ -58,5 +58,15 @@ let package = Package(
 				),
 			]
 		),
+		.testTarget(
+			name: "mvmd-tests",
+			dependencies: [
+				.product(
+					name: "FoundationEssentials",
+					package: "swift-foundation",
+					condition: .when(platforms: [.linux, .windows])
+				)
+			]
+		),
 	]
 )
