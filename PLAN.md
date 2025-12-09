@@ -7,7 +7,8 @@ Build a reusable Swift library (`swift-md-bulk-renamer`) that parses Markdown ta
 - Input: Markdown table with two columns: `original`, `new`. All rows after header are rename instructions.
 - The library should expose parsing + validation + execution APIs so GUI or other apps can orchestrate renames.
 - The CLI should:
-  - Accept an instruction source (stdin by default; optionally `--file <path>`).
+  - Make `mvmd file.md` the simplest happy path: read table, dry-run/confirm, apply renames.
+  - Support stdin when no file is provided.
   - Dry-run by default or behind a flag to show planned changes before applying.
   - Apply renames atomically per file (fail fast, report partial failures).
 
@@ -37,17 +38,18 @@ Build a reusable Swift library (`swift-md-bulk-renamer`) that parses Markdown ta
   - `Planner`: detects conflicts, computes operations, and dry-run output.
   - `Executor`: performs renames, reporting per-file results.
 - CLI:
-  - Simple argument parsing (could start with `ArgumentParser` if we add dependency later).
-  - By default, read stdin; allow `--file` to read from a path; optional `--apply` to actually rename, otherwise dry-run.
+  - Simple argument parsing with `swift-argument-parser` (approved dependency).
+  - Primary UX: `mvmd instructions.md --apply` (or similar) to execute; without `--apply`, print dry-run/plan.
+  - Support subcommands if/when needed:
+    - `mvmd mv file.md` / `mvmd apply file.md` mirrors base behavior but keeps room for other verbs.
+    - `mvmd create ./dir` scaffolds a Markdown table of current files for user editing (question: include nested dirs? hidden files?).
+  - Decide whether to prefer simple single-command interface or subcommands:
+    - Single command (`mvmd file.md`) is friendliest; add `--create ./dir` flag could avoid subcommands.
+    - Subcommands scale better for future features but add typing overhead; could still make bare `mvmd file.md` alias `mv`.
   - Clear error messages and exit codes for parse/validation/IO errors.
 
 ## Open Questions
 - Should we support Git-friendly output (e.g., generate `git mv` commands) or purely use `FileManager.moveItem`?
 - Do we need to support Windows paths now, or macOS/Linux only?
 - Should we handle case-only renames specially on case-insensitive filesystems?
-
-## Next Steps
-- Decide dependency policy (pure stdlib vs `swift-argument-parser`).
-- Sketch data structures and validation rules.
-- Implement parser + validator with fixtures.
-- Build CLI wrapper and add integration tests. 
+- CLI shape: keep `mvmd file.md` as the default apply/dry-run path and expose discovery via `--create` flag, or invest in subcommands (`mv`, `create`) for clarity/extensibility?

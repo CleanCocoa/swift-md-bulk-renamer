@@ -29,7 +29,7 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "swift-md-bulk-renamerTests",
+            name: "swift-md-bulk-renamer-tests",
             dependencies: ["swift-md-bulk-renamer"]
         ),
     ]
