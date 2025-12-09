@@ -7,16 +7,15 @@ Try mvmd on these demo files.
 ```bash
 # From repo root
 swift build
-cd examples
 
 # Preview renames (dry-run)
-../.build/debug/mvmd README.md
+swift run mvmd examples/README.md
 
 # Execute renames
-../.build/debug/mvmd README.md --apply
+swift run mvmd examples/README.md --apply
 
 # Reset demo files
-git checkout .
+git checkout examples/
 ```
 
 ## Rename Table

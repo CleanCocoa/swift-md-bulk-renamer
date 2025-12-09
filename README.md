@@ -8,9 +8,8 @@ Batch file renamer driven by Markdown tables.
 git clone https://github.com/your-org/swift-md-bulk-renamer.git
 cd swift-md-bulk-renamer
 swift build
-cd examples
-../.build/debug/mvmd README.md          # preview
-../.build/debug/mvmd README.md --apply  # execute
+swift run mvmd examples/README.md          # preview
+swift run mvmd examples/README.md --apply  # execute
 ```
 
 See [examples/](examples/) for demo files.

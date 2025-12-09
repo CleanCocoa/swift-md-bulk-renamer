@@ -355,6 +355,38 @@ import Testing
 	#expect(content == "content")
 }
 
+@Test func `uses file parent directory as base for relative paths`() throws {
+	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(
+		UUID().uuidString
+	)
+	defer { try? FileManager.default.removeItem(at: tempDir) }
+
+	let subdir = tempDir.appendingPathComponent("subdir")
+	try FileManager.default.createDirectory(at: subdir, withIntermediateDirectories: true)
+
+	let sourceFile = subdir.appendingPathComponent("source.txt")
+	try "content".write(to: sourceFile, atomically: true, encoding: .utf8)
+
+	let markdown = """
+		| From | To |
+		|------|-----|
+		| source.txt | renamed.txt |
+		"""
+	let markdownFile = subdir.appendingPathComponent("renames.md")
+	try markdown.write(to: markdownFile, atomically: true, encoding: .utf8)
+
+	let output = try runMVMD(
+		arguments: ["subdir/renames.md", "--apply"],
+		workingDirectory: tempDir
+	)
+
+	#expect(output.contains("Successfully renamed 1 file(s)"))
+	#expect(!FileManager.default.fileExists(atPath: sourceFile.path))
+
+	let destFile = subdir.appendingPathComponent("renamed.txt")
+	#expect(FileManager.default.fileExists(atPath: destFile.path))
+}
+
 private func runMVMD(
 	arguments: [String],
 	workingDirectory: URL,

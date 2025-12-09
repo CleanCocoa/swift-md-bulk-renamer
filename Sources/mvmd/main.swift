@@ -34,7 +34,13 @@ struct MVMD: ParsableCommand {
 			try validateInstruction(instruction)
 		}
 
-		let baseDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+		let baseDirectory: URL
+		if let file = file, file != "-" {
+			let fileURL = URL(fileURLWithPath: file).standardized
+			baseDirectory = fileURL.deletingLastPathComponent()
+		} else {
+			baseDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+		}
 		let fileManager = FileManager.default
 
 		let checkExists: (String) -> Bool = { path in
