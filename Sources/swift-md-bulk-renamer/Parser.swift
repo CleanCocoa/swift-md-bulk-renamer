@@ -17,11 +17,11 @@ public func parse(_ markdown: String) throws -> [Instruction] {
 		if cells.count != 2 {
 			throw ParseError.invalidColumnCount(expected: 2, found: cells.count)
 		}
-		let from = cells[0].plainText.trimmingCharacters(in: .whitespaces)
-		let to = cells[1].plainText.trimmingCharacters(in: .whitespaces)
+		let from = cells[0].plainText
+		let to = cells[1].plainText
 
-		if !from.isEmpty && !to.isEmpty {
-			instructions.append(Instruction(from: from, to: to))
+		if let instruction = Instruction(from: from, to: to) {
+			instructions.append(instruction)
 		}
 	}
 
