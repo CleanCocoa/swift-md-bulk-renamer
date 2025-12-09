@@ -1,4 +1,5 @@
 public enum PlanError: Error, Equatable {
+	case sourceNotFound(path: String)
 	case duplicateSource(path: String)
 	case conflictingDestination(path: String)
 	case destinationExists(path: String)
@@ -18,13 +19,18 @@ public struct Plan: Equatable, Sendable {
 
 public func plan(
 	instructions: [Instruction],
-	checkDestinations: (String) -> Bool,
+	checkSourceExists: (String) -> Bool,
+	checkDestinationExists: (String) -> Bool,
 	force: Bool
 ) throws -> Plan {
 	var seenSources: Set<String> = []
 	var seenDestinations: Set<String> = []
 
 	for instruction in instructions {
+		if !checkSourceExists(instruction.from) {
+			throw PlanError.sourceNotFound(path: instruction.from)
+		}
+
 		if seenSources.contains(instruction.from) {
 			throw PlanError.duplicateSource(path: instruction.from)
 		}
@@ -35,7 +41,7 @@ public func plan(
 		}
 		seenDestinations.insert(instruction.to)
 
-		if !force && checkDestinations(instruction.to) {
+		if !force && checkDestinationExists(instruction.to) {
 			throw PlanError.destinationExists(path: instruction.to)
 		}
 	}

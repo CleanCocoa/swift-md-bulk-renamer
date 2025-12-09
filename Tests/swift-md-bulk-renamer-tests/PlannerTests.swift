@@ -9,7 +9,8 @@ import Testing
 	]
 	let result = try plan(
 		instructions: instructions,
-		checkDestinations: { _ in false },
+		checkSourceExists: { _ in true },
+		checkDestinationExists: { _ in false },
 		force: false
 	)
 	#expect(result.instructions == instructions)
@@ -23,7 +24,8 @@ import Testing
 	#expect(throws: PlanError.duplicateSource(path: "a.txt")) {
 		_ = try plan(
 			instructions: instructions,
-			checkDestinations: { _ in false },
+			checkSourceExists: { _ in true },
+			checkDestinationExists: { _ in false },
 			force: false
 		)
 	}
@@ -37,7 +39,8 @@ import Testing
 	#expect(throws: PlanError.conflictingDestination(path: "target.txt")) {
 		_ = try plan(
 			instructions: instructions,
-			checkDestinations: { _ in false },
+			checkSourceExists: { _ in true },
+			checkDestinationExists: { _ in false },
 			force: false
 		)
 	}
@@ -50,7 +53,8 @@ import Testing
 	#expect(throws: PlanError.destinationExists(path: "b.txt")) {
 		_ = try plan(
 			instructions: instructions,
-			checkDestinations: { path in path == "b.txt" },
+			checkSourceExists: { _ in true },
+			checkDestinationExists: { path in path == "b.txt" },
 			force: false
 		)
 	}
@@ -63,7 +67,8 @@ import Testing
 	]
 	let result = try plan(
 		instructions: instructions,
-		checkDestinations: { path in path == "b.txt" || path == "d.txt" },
+		checkSourceExists: { _ in true },
+		checkDestinationExists: { path in path == "b.txt" || path == "d.txt" },
 		force: true
 	)
 	#expect(result.instructions == instructions)
@@ -76,7 +81,8 @@ import Testing
 	]
 	let result = try plan(
 		instructions: instructions,
-		checkDestinations: { _ in false },
+		checkSourceExists: { _ in true },
+		checkDestinationExists: { _ in false },
 		force: false
 	)
 	let output = result.dryRunOutput()
@@ -87,7 +93,8 @@ import Testing
 	let instructions: [Instruction] = []
 	let result = try plan(
 		instructions: instructions,
-		checkDestinations: { _ in false },
+		checkSourceExists: { _ in true },
+		checkDestinationExists: { _ in false },
 		force: false
 	)
 	#expect(result.instructions.isEmpty)
@@ -102,20 +109,22 @@ import Testing
 	#expect(throws: PlanError.destinationExists(path: "b.txt")) {
 		_ = try plan(
 			instructions: instructions,
-			checkDestinations: { _ in true },
+			checkSourceExists: { _ in true },
+			checkDestinationExists: { _ in true },
 			force: false
 		)
 	}
 }
 
-@Test func `checkDestinations not called when force is true`() throws {
+@Test func `checkDestinationExists not called when force is true`() throws {
 	var callCount = 0
 	let instructions = [
 		Instruction(from: "a.txt", to: "b.txt")
 	]
 	_ = try plan(
 		instructions: instructions,
-		checkDestinations: { _ in
+		checkSourceExists: { _ in true },
+		checkDestinationExists: { _ in
 			callCount += 1
 			return true
 		},
@@ -124,7 +133,7 @@ import Testing
 	#expect(callCount == 0)
 }
 
-@Test func `checkDestinations called for each instruction when force is false`() throws {
+@Test func `checkDestinationExists called for each instruction when force is false`() throws {
 	var checkedPaths: [String] = []
 	let instructions = [
 		Instruction(from: "a.txt", to: "b.txt"),
@@ -132,11 +141,26 @@ import Testing
 	]
 	_ = try plan(
 		instructions: instructions,
-		checkDestinations: { path in
+		checkSourceExists: { _ in true },
+		checkDestinationExists: { path in
 			checkedPaths.append(path)
 			return false
 		},
 		force: false
 	)
 	#expect(checkedPaths == ["b.txt", "d.txt"])
+}
+
+@Test func `sourceNotFound thrown when source does not exist`() throws {
+	let instructions = [
+		Instruction(from: "missing.txt", to: "b.txt")
+	]
+	#expect(throws: PlanError.sourceNotFound(path: "missing.txt")) {
+		_ = try plan(
+			instructions: instructions,
+			checkSourceExists: { _ in false },
+			checkDestinationExists: { _ in false },
+			force: false
+		)
+	}
 }
