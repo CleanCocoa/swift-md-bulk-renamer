@@ -3,4 +3,4 @@
 
 set -euo pipefail
 
-swift format --in-place --recursive --parallel ./Sources ./Tests
+swift format --in-place --recursive --parallel ./Sources ./Tests ./Package.swift

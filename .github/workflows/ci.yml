@@ -51,6 +51,6 @@ jobs:
         with:
           xcode-select-version: 26.1
       - name: Format
-        run: swift format --in-place --recursive --parallel ./Sources ./Tests
+        run: swift format --in-place --recursive --parallel ./Sources ./Tests ./Package.swift
       - name: Check for formatting changes
         run: git diff --exit-code
