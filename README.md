@@ -2,6 +2,11 @@
 
 Batch file renamer driven by Markdown tables.
 
+[![CI](https://github.com/CleanCocoa/swift-md-bulk-renamer/actions/workflows/ci.yml/badge.svg)](https://github.com/CleanCocoa/swift-md-bulk-renamer/actions/workflows/ci.yml)
+
+**Platforms:** macOS, Linux, Windows
+**Requires:** Swift 6.2+
+
 ## Quick Start
 
 ```bash
@@ -76,7 +81,7 @@ mvmd - < renames.md
 - First 2-column table in the file is used
 - Header row is required (any names work)
 - Rows with empty "To" column are skipped
-- Paths are relative to current directory
+- Paths are relative to the instruction file's directory (not the current working directory)
 
 ## Safety
 
@@ -84,7 +89,7 @@ mvmd validates all paths before any rename:
 
 - Rejects absolute paths (`/etc/hosts`)
 - Rejects parent escapes (`../secret.txt`)
-- Rejects Windows paths (`C:\file.txt`, `\\server\share`)
+- Rejects Windows-style paths on non-Windows platforms (`C:\file.txt`, `\\server\share`)
 - Rejects symlinks as sources
 - Prevents overwrites unless `--force`
 - Detects duplicate sources
