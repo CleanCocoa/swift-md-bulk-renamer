@@ -3,7 +3,7 @@ import Markdown
 public func generateTable(from instructions: [Instruction]) -> String {
 	let header = Table.Head(Table.Cell(Text("From")), Table.Cell(Text("To")))
 	let rows = instructions.map { instruction in
-		Table.Row(Table.Cell(Text(instruction.from)), Table.Cell(Text(instruction.to)))
+		Table.Row(Table.Cell(Text(instruction.from.value)), Table.Cell(Text(instruction.to.value)))
 	}
 	let body = Table.Body(rows)
 	let table = Table(header: header, body: body)

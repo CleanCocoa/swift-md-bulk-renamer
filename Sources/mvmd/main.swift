@@ -43,7 +43,7 @@ struct MVMD: ParsableCommand {
 		}
 
 		for instruction in instructions {
-			try validateNotSymlink(instruction.from, in: baseDirectory, fileManager: fileManager)
+			try validateNotSymlink(instruction.from.value, in: baseDirectory, fileManager: fileManager)
 		}
 
 		let renameplan = try plan(

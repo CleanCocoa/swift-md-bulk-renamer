@@ -48,6 +48,6 @@ public func validateNotSymlink(_ path: String, in baseDirectory: URL, fileManage
 }
 
 public func validateInstruction(_ instruction: Instruction) throws {
-	try validatePath(instruction.from)
-	try validatePath(instruction.to)
+	try validatePath(instruction.from.value)
+	try validatePath(instruction.to.value)
 }

@@ -13,7 +13,7 @@ public struct Plan: Equatable, Sendable {
 	}
 
 	public func dryRunOutput() -> String {
-		instructions.map { "\($0.from) -> \($0.to)" }.joined(separator: "\n")
+		instructions.map { "\($0.from.value) -> \($0.to.value)" }.joined(separator: "\n")
 	}
 }
 
@@ -27,22 +27,25 @@ public func plan(
 	var seenDestinations: Set<String> = []
 
 	for instruction in instructions {
-		if !checkSourceExists(instruction.from) {
-			throw PlanError.sourceNotFound(path: instruction.from)
+		let from = instruction.from.value
+		let to = instruction.to.value
+
+		if !checkSourceExists(from) {
+			throw PlanError.sourceNotFound(path: from)
 		}
 
-		if seenSources.contains(instruction.from) {
-			throw PlanError.duplicateSource(path: instruction.from)
+		if seenSources.contains(from) {
+			throw PlanError.duplicateSource(path: from)
 		}
-		seenSources.insert(instruction.from)
+		seenSources.insert(from)
 
-		if seenDestinations.contains(instruction.to) {
-			throw PlanError.conflictingDestination(path: instruction.to)
+		if seenDestinations.contains(to) {
+			throw PlanError.conflictingDestination(path: to)
 		}
-		seenDestinations.insert(instruction.to)
+		seenDestinations.insert(to)
 
-		if !force && checkDestinationExists(instruction.to) {
-			throw PlanError.destinationExists(path: instruction.to)
+		if !force && checkDestinationExists(to) {
+			throw PlanError.destinationExists(path: to)
 		}
 	}
 

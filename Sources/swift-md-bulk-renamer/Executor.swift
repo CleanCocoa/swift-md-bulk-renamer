@@ -27,11 +27,11 @@ public struct Executor {
 
 	public func execute(_ instructions: [Instruction]) throws {
 		for instruction in instructions {
-			let sourceURL = baseDirectory.appendingPathComponent(instruction.from)
-			let destinationURL = baseDirectory.appendingPathComponent(instruction.to)
+			let sourceURL = baseDirectory.appendingPathComponent(instruction.from.value)
+			let destinationURL = baseDirectory.appendingPathComponent(instruction.to.value)
 
 			guard fileManager.fileExists(atPath: sourceURL.path) else {
-				throw ExecutorError.sourceNotFound(path: instruction.from)
+				throw ExecutorError.sourceNotFound(path: instruction.from.value)
 			}
 
 			let destinationParent = destinationURL.deletingLastPathComponent()
@@ -46,8 +46,8 @@ public struct Executor {
 				try fileManager.moveItem(at: sourceURL, to: destinationURL)
 			} catch {
 				throw ExecutorError.renameFailed(
-					from: instruction.from,
-					to: instruction.to,
+					from: instruction.from.value,
+					to: instruction.to.value,
 					underlying: error
 				)
 			}
