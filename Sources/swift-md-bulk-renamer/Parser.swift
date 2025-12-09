@@ -20,7 +20,7 @@ public func parse(_ markdown: String) throws -> [Instruction] {
 		let from = cells[0].plainText.trimmingCharacters(in: .whitespaces)
 		let to = cells[1].plainText.trimmingCharacters(in: .whitespaces)
 
-		if !to.isEmpty {
+		if !from.isEmpty && !to.isEmpty {
 			instructions.append(Instruction(from: from, to: to))
 		}
 	}
