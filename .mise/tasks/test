@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Run Swift tests with filtered output"
+
+set -euo pipefail
+
+swift test -j 8 --parallel -Xswiftc -suppress-warnings 2>&1 | bash .mise/helpers/swift-test-filter.sh
