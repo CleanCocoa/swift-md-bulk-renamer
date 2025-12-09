@@ -46,38 +46,63 @@ import Testing
 	}
 }
 
-@Test func `rejects Windows drive prefixes`() {
-	#expect(throws: PathValidationError.windowsDrivePrefix("C:file.txt")) {
+#if !os(Windows)
+	@Test func `rejects Windows drive prefixes`() {
+		#expect(throws: PathValidationError.windowsDrivePrefix("C:file.txt")) {
+			try validatePath("C:file.txt")
+		}
+		#expect(throws: PathValidationError.windowsDrivePrefix("C:\\file.txt")) {
+			try validatePath("C:\\file.txt")
+		}
+		#expect(throws: PathValidationError.windowsDrivePrefix("D:\\dir\\file.txt")) {
+			try validatePath("D:\\dir\\file.txt")
+		}
+		#expect(throws: PathValidationError.windowsDrivePrefix("Z:file.txt")) {
+			try validatePath("Z:file.txt")
+		}
+		#expect(throws: PathValidationError.windowsDrivePrefix("c:file.txt")) {
+			try validatePath("c:file.txt")
+		}
+		#expect(throws: PathValidationError.windowsDrivePrefix("d:\\file.txt")) {
+			try validatePath("d:\\file.txt")
+		}
+	}
+
+	@Test func `rejects Windows UNC paths`() {
+		#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share")) {
+			try validatePath("\\\\server\\share")
+		}
+		#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
+			try validatePath("\\\\server\\share\\file.txt")
+		}
+		#expect(throws: PathValidationError.windowsUNCPath("\\\\")) {
+			try validatePath("\\\\")
+		}
+	}
+#endif
+
+#if os(Windows)
+	@Test func `accepts Windows drive prefixes on Windows`() throws {
 		try validatePath("C:file.txt")
-	}
-	#expect(throws: PathValidationError.windowsDrivePrefix("C:\\file.txt")) {
 		try validatePath("C:\\file.txt")
-	}
-	#expect(throws: PathValidationError.windowsDrivePrefix("D:\\dir\\file.txt")) {
 		try validatePath("D:\\dir\\file.txt")
-	}
-	#expect(throws: PathValidationError.windowsDrivePrefix("Z:file.txt")) {
-		try validatePath("Z:file.txt")
-	}
-	#expect(throws: PathValidationError.windowsDrivePrefix("c:file.txt")) {
 		try validatePath("c:file.txt")
 	}
-	#expect(throws: PathValidationError.windowsDrivePrefix("d:\\file.txt")) {
-		try validatePath("d:\\file.txt")
-	}
-}
 
-@Test func `rejects Windows UNC paths`() {
-	#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share")) {
+	@Test func `accepts Windows UNC paths on Windows`() throws {
 		try validatePath("\\\\server\\share")
-	}
-	#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
 		try validatePath("\\\\server\\share\\file.txt")
 	}
-	#expect(throws: PathValidationError.windowsUNCPath("\\\\")) {
-		try validatePath("\\\\")
+
+	@Test func `rejects parent directory escapes with backslashes on Windows`() {
+		#expect(throws: PathValidationError.parentDirectoryEscape("..\\file.txt")) {
+			try validatePath("..\\file.txt")
+		}
+		#expect(throws: PathValidationError.parentDirectoryEscape("dir\\..\\file.txt")) {
+			try validatePath("dir\\..\\file.txt")
+		}
 	}
-}
+#endif
 
 @Test func `accepts paths with colons not at drive position`() throws {
 	try validatePath("file:name.txt")
@@ -118,30 +143,47 @@ import Testing
 	}
 }
 
-@Test func `validateInstruction rejects Windows drive in from`() {
-	let instruction = Instruction(from: "C:\\file.txt", to: "local.txt")!
-	#expect(throws: PathValidationError.windowsDrivePrefix("C:\\file.txt")) {
-		try validateInstruction(instruction)
+#if !os(Windows)
+	@Test func `validateInstruction rejects Windows drive in from`() {
+		let instruction = Instruction(from: "C:\\file.txt", to: "local.txt")!
+		#expect(throws: PathValidationError.windowsDrivePrefix("C:\\file.txt")) {
+			try validateInstruction(instruction)
+		}
 	}
-}
 
-@Test func `validateInstruction rejects Windows drive in to`() {
-	let instruction = Instruction(from: "local.txt", to: "D:\\file.txt")!
-	#expect(throws: PathValidationError.windowsDrivePrefix("D:\\file.txt")) {
-		try validateInstruction(instruction)
+	@Test func `validateInstruction rejects Windows drive in to`() {
+		let instruction = Instruction(from: "local.txt", to: "D:\\file.txt")!
+		#expect(throws: PathValidationError.windowsDrivePrefix("D:\\file.txt")) {
+			try validateInstruction(instruction)
+		}
 	}
-}
 
-@Test func `validateInstruction rejects Windows UNC in from`() {
-	let instruction = Instruction(from: "\\\\server\\share\\file.txt", to: "local.txt")!
-	#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
-		try validateInstruction(instruction)
+	@Test func `validateInstruction rejects Windows UNC in from`() {
+		let instruction = Instruction(from: "\\\\server\\share\\file.txt", to: "local.txt")!
+		#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
+			try validateInstruction(instruction)
+		}
 	}
-}
 
-@Test func `validateInstruction rejects Windows UNC in to`() {
-	let instruction = Instruction(from: "local.txt", to: "\\\\server\\share\\file.txt")!
-	#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
-		try validateInstruction(instruction)
+	@Test func `validateInstruction rejects Windows UNC in to`() {
+		let instruction = Instruction(from: "local.txt", to: "\\\\server\\share\\file.txt")!
+		#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
+			try validateInstruction(instruction)
+		}
 	}
-}
+#endif
+
+#if os(Windows)
+	@Test func `validateInstruction accepts Windows paths on Windows`() throws {
+		try validateInstruction(Instruction(from: "C:\\file.txt", to: "local.txt")!)
+		try validateInstruction(Instruction(from: "local.txt", to: "D:\\dir\\file.txt")!)
+		try validateInstruction(Instruction(from: "\\\\server\\share\\file.txt", to: "local.txt")!)
+	}
+
+	@Test func `validateInstruction rejects parent escape with backslashes on Windows`() {
+		let instruction = Instruction(from: "..\\file.txt", to: "local.txt")!
+		#expect(throws: PathValidationError.parentDirectoryEscape("..\\file.txt")) {
+			try validateInstruction(instruction)
+		}
+	}
+#endif

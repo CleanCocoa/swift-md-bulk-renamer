@@ -18,26 +18,36 @@ public func validatePath(_ path: String) throws {
 		throw PathValidationError.absolutePath(path)
 	}
 
-	if path.hasPrefix(#"\\"#) {
-		throw PathValidationError.windowsUNCPath(path)
-	}
+	#if !os(Windows)
+		if path.hasPrefix(#"\\"#) {
+			throw PathValidationError.windowsUNCPath(path)
+		}
 
-	if path.count >= 2 {
-		let secondChar = path.index(path.startIndex, offsetBy: 1)
-		if path[secondChar] == ":" {
-			let firstChar = path[path.startIndex]
-			if firstChar.isLetter {
-				throw PathValidationError.windowsDrivePrefix(path)
+		if path.count >= 2 {
+			let secondChar = path.index(path.startIndex, offsetBy: 1)
+			if path[secondChar] == ":" {
+				let firstChar = path[path.startIndex]
+				if firstChar.isLetter {
+					throw PathValidationError.windowsDrivePrefix(path)
+				}
 			}
 		}
-	}
 
-	let components = path.split(separator: "/", omittingEmptySubsequences: false)
-	for component in components {
-		if component == ".." {
-			throw PathValidationError.parentDirectoryEscape(path)
+		let components = path.split(separator: "/", omittingEmptySubsequences: false)
+		for component in components {
+			if component == ".." {
+				throw PathValidationError.parentDirectoryEscape(path)
+			}
 		}
-	}
+	#else
+		let normalizedPath = path.replacingOccurrences(of: "\\", with: "/")
+		let components = normalizedPath.split(separator: "/", omittingEmptySubsequences: false)
+		for component in components {
+			if component == ".." {
+				throw PathValidationError.parentDirectoryEscape(path)
+			}
+		}
+	#endif
 }
 
 public func validateNotSymlink(_ path: String, in baseDirectory: URL, fileManager: FileManager = .default) throws {

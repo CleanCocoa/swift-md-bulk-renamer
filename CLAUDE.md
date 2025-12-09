@@ -41,7 +41,7 @@ Tests/
 
 ## Safety Constraints
 
-- Reject absolute paths, `..` escapes, Windows drive/UNC prefixes
+- Reject absolute paths, `..` escapes; Windows drive/UNC prefixes rejected on non-Windows only
 - No overwrites unless `--force`
 - Detect duplicate originals and conflicting destinations before any mutation
 - Symlink policy must be explicit (avoid unintentional following)
