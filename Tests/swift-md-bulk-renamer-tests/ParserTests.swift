@@ -12,8 +12,8 @@ import Testing
 	let instructions = try parse(markdown)
 	#expect(
 		instructions == [
-			Instruction(from: "a.txt", to: "b.txt"),
-			Instruction(from: "c.md", to: "d.md"),
+			Instruction(from: "a.txt", to: "b.txt")!,
+			Instruction(from: "c.md", to: "d.md")!,
 		]
 	)
 }
@@ -28,7 +28,7 @@ import Testing
 	let instructions = try parse(markdown)
 	#expect(
 		instructions == [
-			Instruction(from: "a.txt", to: "b.txt")
+			Instruction(from: "a.txt", to: "b.txt")!
 		]
 	)
 }
@@ -42,8 +42,8 @@ import Testing
 
 @Test func `generates table from instructions`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "c.md", to: "d.md"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "c.md", to: "d.md")!,
 	]
 	let output = generateTable(from: instructions)
 	#expect(output.contains("From"))
@@ -63,8 +63,8 @@ import Testing
 
 @Test func `round-trip preserves instructions`() throws {
 	let instructions = [
-		Instruction(from: "foo.txt", to: "bar.txt"),
-		Instruction(from: "baz.md", to: "qux.md"),
+		Instruction(from: "foo.txt", to: "bar.txt")!,
+		Instruction(from: "baz.md", to: "qux.md")!,
 	]
 	let markdown = generateTable(from: instructions)
 	let parsed = try parse(markdown)

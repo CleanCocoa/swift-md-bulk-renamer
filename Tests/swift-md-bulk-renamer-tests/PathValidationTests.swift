@@ -86,61 +86,61 @@ import Testing
 }
 
 @Test func `validateInstruction checks both from and to paths`() throws {
-	try validateInstruction(Instruction(from: "a.txt", to: "b.txt"))
-	try validateInstruction(Instruction(from: "dir/a.txt", to: "dir/b.txt"))
+	try validateInstruction(Instruction(from: "a.txt", to: "b.txt")!)
+	try validateInstruction(Instruction(from: "dir/a.txt", to: "dir/b.txt")!)
 }
 
 @Test func `validateInstruction rejects absolute path in from`() {
-	let instruction = Instruction(from: "/etc/hosts", to: "local.txt")
+	let instruction = Instruction(from: "/etc/hosts", to: "local.txt")!
 	#expect(throws: PathValidationError.absolutePath("/etc/hosts")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects absolute path in to`() {
-	let instruction = Instruction(from: "local.txt", to: "/etc/hosts")
+	let instruction = Instruction(from: "local.txt", to: "/etc/hosts")!
 	#expect(throws: PathValidationError.absolutePath("/etc/hosts")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects parent escape in from`() {
-	let instruction = Instruction(from: "../file.txt", to: "local.txt")
+	let instruction = Instruction(from: "../file.txt", to: "local.txt")!
 	#expect(throws: PathValidationError.parentDirectoryEscape("../file.txt")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects parent escape in to`() {
-	let instruction = Instruction(from: "local.txt", to: "../file.txt")
+	let instruction = Instruction(from: "local.txt", to: "../file.txt")!
 	#expect(throws: PathValidationError.parentDirectoryEscape("../file.txt")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects Windows drive in from`() {
-	let instruction = Instruction(from: "C:\\file.txt", to: "local.txt")
+	let instruction = Instruction(from: "C:\\file.txt", to: "local.txt")!
 	#expect(throws: PathValidationError.windowsDrivePrefix("C:\\file.txt")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects Windows drive in to`() {
-	let instruction = Instruction(from: "local.txt", to: "D:\\file.txt")
+	let instruction = Instruction(from: "local.txt", to: "D:\\file.txt")!
 	#expect(throws: PathValidationError.windowsDrivePrefix("D:\\file.txt")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects Windows UNC in from`() {
-	let instruction = Instruction(from: "\\\\server\\share\\file.txt", to: "local.txt")
+	let instruction = Instruction(from: "\\\\server\\share\\file.txt", to: "local.txt")!
 	#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
 		try validateInstruction(instruction)
 	}
 }
 
 @Test func `validateInstruction rejects Windows UNC in to`() {
-	let instruction = Instruction(from: "local.txt", to: "\\\\server\\share\\file.txt")
+	let instruction = Instruction(from: "local.txt", to: "\\\\server\\share\\file.txt")!
 	#expect(throws: PathValidationError.windowsUNCPath("\\\\server\\share\\file.txt")) {
 		try validateInstruction(instruction)
 	}

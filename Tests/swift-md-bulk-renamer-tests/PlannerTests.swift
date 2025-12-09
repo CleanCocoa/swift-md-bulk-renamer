@@ -4,8 +4,8 @@ import Testing
 
 @Test func `valid instructions create plan successfully`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "c.md", to: "d.md"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "c.md", to: "d.md")!,
 	]
 	let result = try plan(
 		instructions: instructions,
@@ -18,8 +18,8 @@ import Testing
 
 @Test func `duplicate source paths throw duplicateSource`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "a.txt", to: "c.txt"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "a.txt", to: "c.txt")!,
 	]
 	#expect(throws: PlanError.duplicateSource(path: "a.txt")) {
 		_ = try plan(
@@ -33,8 +33,8 @@ import Testing
 
 @Test func `conflicting destination paths throw conflictingDestination`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "target.txt"),
-		Instruction(from: "b.txt", to: "target.txt"),
+		Instruction(from: "a.txt", to: "target.txt")!,
+		Instruction(from: "b.txt", to: "target.txt")!,
 	]
 	#expect(throws: PlanError.conflictingDestination(path: "target.txt")) {
 		_ = try plan(
@@ -48,7 +48,7 @@ import Testing
 
 @Test func `existing destination throws destinationExists when force is false`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt")
+		Instruction(from: "a.txt", to: "b.txt")!
 	]
 	#expect(throws: PlanError.destinationExists(path: "b.txt")) {
 		_ = try plan(
@@ -62,8 +62,8 @@ import Testing
 
 @Test func `existing destination allowed when force is true`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "c.txt", to: "d.txt"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "c.txt", to: "d.txt")!,
 	]
 	let result = try plan(
 		instructions: instructions,
@@ -76,8 +76,8 @@ import Testing
 
 @Test func `dryRunOutput returns correct format`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "c.md", to: "d.md"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "c.md", to: "d.md")!,
 	]
 	let result = try plan(
 		instructions: instructions,
@@ -103,8 +103,8 @@ import Testing
 
 @Test func `multiple existing destinations throw on first conflict`() throws {
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "c.txt", to: "d.txt"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "c.txt", to: "d.txt")!,
 	]
 	#expect(throws: PlanError.destinationExists(path: "b.txt")) {
 		_ = try plan(
@@ -119,7 +119,7 @@ import Testing
 @Test func `checkDestinationExists not called when force is true`() throws {
 	var callCount = 0
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt")
+		Instruction(from: "a.txt", to: "b.txt")!
 	]
 	_ = try plan(
 		instructions: instructions,
@@ -136,8 +136,8 @@ import Testing
 @Test func `checkDestinationExists called for each instruction when force is false`() throws {
 	var checkedPaths: [String] = []
 	let instructions = [
-		Instruction(from: "a.txt", to: "b.txt"),
-		Instruction(from: "c.txt", to: "d.txt"),
+		Instruction(from: "a.txt", to: "b.txt")!,
+		Instruction(from: "c.txt", to: "d.txt")!,
 	]
 	_ = try plan(
 		instructions: instructions,
@@ -153,7 +153,7 @@ import Testing
 
 @Test func `sourceNotFound thrown when source does not exist`() throws {
 	let instructions = [
-		Instruction(from: "missing.txt", to: "b.txt")
+		Instruction(from: "missing.txt", to: "b.txt")!
 	]
 	#expect(throws: PlanError.sourceNotFound(path: "missing.txt")) {
 		_ = try plan(

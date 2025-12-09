@@ -15,7 +15,7 @@ import Testing
 	try "test content".write(to: sourcePath, atomically: true, encoding: .utf8)
 
 	let executor = Executor(baseDirectory: tempDir)
-	let instructions = [Instruction(from: "original.txt", to: "renamed.txt")]
+	let instructions = [Instruction(from: "original.txt", to: "renamed.txt")!]
 
 	try executor.execute(instructions)
 
@@ -45,9 +45,9 @@ import Testing
 
 	let executor = Executor(baseDirectory: tempDir)
 	let instructions = [
-		Instruction(from: "file1.txt", to: "new1.txt"),
-		Instruction(from: "file2.md", to: "new2.md"),
-		Instruction(from: "file3.doc", to: "new3.doc"),
+		Instruction(from: "file1.txt", to: "new1.txt")!,
+		Instruction(from: "file2.md", to: "new2.md")!,
+		Instruction(from: "file3.doc", to: "new3.doc")!,
 	]
 
 	try executor.execute(instructions)
@@ -81,7 +81,7 @@ import Testing
 	try "test content".write(to: sourcePath, atomically: true, encoding: .utf8)
 
 	let executor = Executor(baseDirectory: tempDir)
-	let instructions = [Instruction(from: "source.txt", to: "subdir/nested/target.txt")]
+	let instructions = [Instruction(from: "source.txt", to: "subdir/nested/target.txt")!]
 
 	try executor.execute(instructions)
 
@@ -107,7 +107,7 @@ import Testing
 	try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
 	let executor = Executor(baseDirectory: tempDir)
-	let instructions = [Instruction(from: "nonexistent.txt", to: "target.txt")]
+	let instructions = [Instruction(from: "nonexistent.txt", to: "target.txt")!]
 
 	#expect(throws: ExecutorError.sourceNotFound(path: "nonexistent.txt")) {
 		try executor.execute(instructions)
