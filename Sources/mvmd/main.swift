@@ -1,6 +1,11 @@
 import ArgumentParser
-import Foundation
 import swift_md_bulk_renamer
+
+#if canImport(FoundationEssentials)
+	import FoundationEssentials
+#else
+	import Foundation
+#endif
 
 @main
 struct MVMD: ParsableCommand {

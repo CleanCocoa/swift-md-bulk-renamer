@@ -1,7 +1,12 @@
-import Foundation
 import Testing
 
 @testable import swift_md_bulk_renamer
+
+#if canImport(FoundationEssentials)
+	import FoundationEssentials
+#else
+	import Foundation
+#endif
 
 @Test func `dry-run outputs from -> to format`() throws {
 	let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(

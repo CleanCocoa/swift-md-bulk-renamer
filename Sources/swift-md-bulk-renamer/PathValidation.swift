@@ -1,4 +1,8 @@
-import Foundation
+#if canImport(FoundationEssentials)
+	import FoundationEssentials
+#else
+	import Foundation
+#endif
 
 public enum PathValidationError: Error, Equatable {
 	case absolutePath(String)

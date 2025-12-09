@@ -1,4 +1,8 @@
-import Foundation
+#if canImport(FoundationEssentials)
+	import FoundationEssentials
+#else
+	import Foundation
+#endif
 
 public enum ExecutorError: Error, Equatable {
 	case sourceNotFound(path: String)
